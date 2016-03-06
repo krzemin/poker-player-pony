@@ -66,8 +66,10 @@ object Player {
 
   val random = new Random()
 
-  def decideBet(myCards: List[Card], minimumRaise: Int): Int = {
-    if(myCards.groupBy(_.rank).values.exists(_.size == 2)) {
+  def decideBet(myCards: List[Card],
+                communityCards: List[Card],
+                minimumRaise: Int): Int = {
+    if((myCards ++ communityCards).groupBy(_.rank).values.exists(_.size == 2)) {
       minimumRaise
     } else {
       0
@@ -77,8 +79,9 @@ object Player {
 
   def betRequest(request: JsonElement) = Try {
     val myCards = getMyCards(request)
+    val communityCards = getCommunityCards(request)
     val minRaise = getMinimumRaise(request)
-    decideBet(myCards, minRaise)
+    decideBet(myCards, communityCards, minRaise)
   }.getOrElse(random.nextInt(100))
 
   def showdown(game: JsonElement) {
