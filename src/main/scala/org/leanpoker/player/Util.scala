@@ -5,6 +5,14 @@ package org.leanpoker.player
   */
 object Util {
 
-	
+	def isStrit(myCards: List[Card], community: List[Card]): Boolean = {
+		(myCards ++ community).
+			sortBy(_.rank).
+			map(_.getRankInt).
+			sliding(5).
+			map(l => l.last - l.head).
+			exists(_ == 4)
+
+	}
 
 }

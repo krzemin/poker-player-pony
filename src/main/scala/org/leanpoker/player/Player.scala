@@ -5,6 +5,7 @@ import scala.collection.JavaConversions._
 import scala.util.{Random, Try}
 
 case class Card(rank: Char, suits: String)  {
+
   def getRankInt: Int = {
     val rankToNumMap = Map(
       'A' -> 13,
@@ -24,9 +25,6 @@ case class Card(rank: Char, suits: String)  {
     rankToNumMap(rank)
   }
 }
-
-
-
 
 
 object Player {
