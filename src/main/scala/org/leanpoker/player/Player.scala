@@ -70,9 +70,9 @@ object Player {
                 communityCards: List[Card],
                 minimumRaise: Int): Int = {
     if((myCards ++ communityCards).groupBy(_.rank).values.exists(_.size == 2)) {
-      minimumRaise
+      minimumRaise + 50
     } else {
-      0
+      if(random.nextBoolean()) minimumRaise else 0
     }
   }
 
