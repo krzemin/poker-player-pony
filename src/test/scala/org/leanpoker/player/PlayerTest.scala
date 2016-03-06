@@ -20,7 +20,7 @@ class PlayerTest extends FunSpec with MustMatchers {
   }
 
   it("parse minimum raise") {
-    Player.getMinimumRaise(gameStateJson) mustBe 240
+    Player.getMinBuyIn(gameStateJson) mustBe 240
   }
 
   it("parse bet index") {

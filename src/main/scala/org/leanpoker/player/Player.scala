@@ -39,7 +39,7 @@ case class Color(suit: String) { def combRank = 5 }
 case class BetParams(myCards: List[Card],
                      communityCards: List[Card],
                      betIdx: Int,
-                     minimumRaise: Int,
+                     buyIn: Int,
                      stack: Int)
 
 
@@ -86,8 +86,8 @@ object Player {
     request.getAsJsonObject.get("community_cards").getAsJsonArray.toList.map(j => parseCard(j.getAsJsonObject))
   }
 
-  def getMinimumRaise(request: JsonElement): Int = {
-    request.getAsJsonObject.get("minimum_raise").getAsInt
+  def getMinBuyIn(request: JsonElement): Int = {
+    request.getAsJsonObject.get("current_buy_in").getAsInt
   }
 
   def getBetIndex(request: JsonElement): Int = {
@@ -144,19 +144,14 @@ object Player {
     val maxColorsTable = colorGroupOf(params.communityCards)
 
     if (isStrit(params.myCards, params.communityCards)) {
-      params.minimumRaise + 50
+      params.buyIn + 50
     } else if (maxGroupAll >= 2 && maxGroupAll != maxGroupTable) {
-      lazy val pairCardRank = params.myCards.map(_.getRankInt).intersect(params.communityCards.map(_.getRankInt)).head
-      if(maxGroupAll == 2 && maxGroupTable == 1 && pairCardRank < 9) {
-        0
-      } else {
-        params.minimumRaise + maxGroupAll * 20
-      }
+      params.buyIn + maxGroupAll * 30
     } else if (maxColorsAll == 5) {
       params.stack
     } else {
       if (random.nextDouble() < getStartHandPower(params.myCards))
-        params.minimumRaise
+        params.buyIn
       else
         0
     }
@@ -167,7 +162,7 @@ object Player {
     val myCards = getMyCards(request)
     val communityCards = getCommunityCards(request)
     val betIndex = getBetIndex(request)
-    val minRaise = getMinimumRaise(request)
+    val minRaise = getMinBuyIn(request)
     val myStack = getMyStack(request)
     val betParams = BetParams(myCards, communityCards, betIndex, minRaise, myStack)
     decideBet(betParams)
@@ -218,7 +213,7 @@ object Player {
   )
 
   def getStartHandPower(myCards: List[Card]): Double = {
-    statistics.getOrElse(getRankHand(myCards), 5.0) / 100.0
+    statistics.getOrElse(getRankHand(myCards), 2.0) / 100.0
   }
 
   def getRankHand(myCards: List[Card]): RankHand = {
