@@ -4,7 +4,27 @@ import com.google.gson.JsonElement
 import scala.collection.JavaConversions._
 import scala.util.{Random, Try}
 
-case class Card(rank: Char, suits: String)
+case class Card(rank: Char, suits: String)  {
+  def getRankInt: Int = {
+    val rankToNumMap = Map{
+      'A' -> 13,
+      'K' -> 12,
+      'Q' -> 11,
+      'J' -> 10,
+      '1' -> 9,
+      '9' -> 8,
+      '8' -> 7,
+      '7' -> 6,
+      '6' -> 5,
+      '5' -> 4,
+      '4' -> 3,
+      '3' -> 2,
+      '2' -> 1
+    }
+    rankToNumMap(rank)
+  }
+}
+
 
 
 
