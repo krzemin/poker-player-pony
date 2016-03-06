@@ -34,12 +34,12 @@ class PlayerTest extends FunSpec with MustMatchers {
 
   val pair = List(Card('4', ""), Card('4', ""))
 
-  it("should bet minimum raise + 200 when have pair") {
-    Player.decideBet(BetParams(pair, Nil, 0, 100, 0)) mustBe 300
+  it("should bet minimum raise + 40 when have pair") {
+    Player.decideBet(BetParams(pair, Nil, 0, 100, 0)) mustBe 140
   }
 
-  it("should bet minimum raise + 200 when have pair with community") {
-    Player.decideBet(BetParams(List(Card('A', "")), List(Card('A', "")), 0, 200, 0)) mustBe 400
+  it("should bet minimum raise + 40 when have pair with community") {
+    Player.decideBet(BetParams(List(Card('A', "")), List(Card('A', "")), 0, 200, 0)) mustBe 240
   }
 
 

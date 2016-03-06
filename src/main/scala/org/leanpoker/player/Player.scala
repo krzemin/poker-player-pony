@@ -103,7 +103,7 @@ object Player {
 
 
   def maxGroupOf(cards: List[Card]): Int = {
-    if(cards.isEmpty) 0
+    if (cards.isEmpty) 0
     else
       cards
         .groupBy(_.rank)
@@ -113,7 +113,7 @@ object Player {
   }
 
   def colorGroupOf(cards: List[Card]): Int = {
-    if(cards.isEmpty) 0
+    if (cards.isEmpty) 0
     else
       cards
         .groupBy(_.suit)
@@ -127,6 +127,7 @@ object Player {
     (myCards ++ community).
       sortBy(_.rank).
       map(_.getRankInt).
+      distinct.
       sliding(5).
       map(l => l.last - l.head).
       contains(4)
@@ -142,16 +143,14 @@ object Player {
     val maxColorsAll = colorGroupOf(allCards)
     val maxColorsTable = colorGroupOf(params.communityCards)
 
-    if(isStrit(params.myCards, params.communityCards)) {
+    if (isStrit(params.myCards, params.communityCards)) {
       params.minimumRaise + 50
-    } else if(maxGroupAll >= 2 && maxGroupAll != maxGroupTable) {
+    } else if (maxGroupAll >= 2 && maxGroupAll != maxGroupTable) {
       params.minimumRaise + maxGroupAll * 20
-    } else if(maxColorsAll == 5) {
+    } else if (maxColorsAll == 5) {
       params.stack
     } else {
-      val hasStrongCards = params.myCards.map(_.getRankInt).sum > 18
-
-      if((hasStrongCards && random.nextDouble() < 0.65) || random.nextDouble() < 0.1)
+      if (random.nextDouble() < getStartHandPower(params.myCards))
         params.minimumRaise
       else
         0
@@ -172,4 +171,61 @@ object Player {
   def showdown(game: JsonElement) {
 
   }
+
+
+  case class RankHand(siuted: Boolean, card1: Int, card2: Int)
+
+  val statistics = Map[RankHand, Double](
+    RankHand(false, 13, 13) -> 31.0,
+    RankHand(false, 12, 12) -> 26.0,
+    RankHand(false, 11, 11) -> 22.0,
+    RankHand(true, 13, 12) -> 20.2,
+    RankHand(false, 10, 10) -> 19.1,
+    RankHand(true, 13, 11) -> 18.7,
+    RankHand(true, 12, 11) -> 18.1,
+    RankHand(true, 13, 10) -> 17.5,
+    RankHand(true, 12, 10) -> 17.1,
+    RankHand(false, 9, 9) -> 16.8,
+    RankHand(false, 13, 12) -> 16.7,
+    RankHand(true, 13, 9) -> 16.6,
+    RankHand(true, 11, 10) -> 16.6,
+    RankHand(true, 12, 9) -> 16.1,
+    RankHand(true, 11, 9) -> 15.8,
+    RankHand(true, 10, 9) -> 15.8,
+    RankHand(false, 8, 8) -> 15.3,
+    RankHand(false, 13, 11) -> 14.9,
+    RankHand(true, 13, 8) -> 14.6,
+    RankHand(false, 12, 11) -> 14.4,
+    RankHand(false, 7, 7) -> 14.2,
+    RankHand(true, 12, 8) -> 14.2,
+    RankHand(true, 13, 8) -> 14.1,
+    RankHand(true, 13, 7) -> 13.9,
+    RankHand(true, 11, 8) -> 13.8,
+    RankHand(true, 10, 8) -> 13.8,
+    RankHand(false, 13, 10) -> 13.5,
+    RankHand(true, 13, 4) -> 13.4,
+    RankHand(false, 6, 6) -> 13.4,
+    RankHand(true, 13, 6) -> 13.4,
+    RankHand(false, 12, 10) -> 13.2,
+    RankHand(true, 13, 3) -> 13.2,
+    RankHand(true, 13, 2) -> 13.1,
+    RankHand(true, 13, 5) -> 13.0
+  )
+
+  def getStartHandPower(myCards: List[Card]): Double = {
+    statistics.getOrElse(getRankHand(myCards), 5.0) / 100.0
+  }
+
+  def getRankHand(myCards: List[Card]): RankHand = {
+    val first = myCards.head
+    val second = myCards.last
+    val areSuited = first.suit == second.suit
+
+    if (first.getRankInt > second.getRankInt) {
+      RankHand(areSuited, first.getRankInt, second.getRankInt)
+    } else {
+      RankHand(areSuited, second.getRankInt, first.getRankInt)
+    }
+  }
+
 }
