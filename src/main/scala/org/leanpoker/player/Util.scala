@@ -48,10 +48,15 @@ object Util {
 		statistics.get(getRankHand(myCards)).getOrElse(5.0)
 	}
 
-	def getRankHand(myCards: List[Card]): RankHand ={
+	def getRankHand(myCards: List[Card]): RankHand = {
+		if(myCards.size != 2){
+			return RankHand(false, 1, 1)
+		}
+
 		val first = myCards.head
 		val second = myCards.last
 		val areSuited = first.suits.equals(second.suits)
+
 		if(first.getRankInt > second.getRankInt){
 			RankHand(areSuited, first.getRankInt, second.getRankInt)
 		} else {
