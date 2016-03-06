@@ -86,7 +86,7 @@ object Player {
       params.minimumRaise + maxGroup * 100
     } else {
 
-      val hasStrongCards = allCards.map(_.getRankInt).sum > 18
+      val hasStrongCards = params.myCards.map(_.getRankInt).sum > 18
 
       if(params.betIdx <= 1 || (hasStrongCards && random.nextDouble() < 0.8) || random.nextDouble() < 0.3)
         params.minimumRaise
