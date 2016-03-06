@@ -146,7 +146,12 @@ object Player {
     if (isStrit(params.myCards, params.communityCards)) {
       params.minimumRaise + 50
     } else if (maxGroupAll >= 2 && maxGroupAll != maxGroupTable) {
-      params.minimumRaise + maxGroupAll * 20
+      val pairCardRank = params.myCards.map(_.getRankInt).intersect(params.communityCards.map(_.getRankInt)).head
+      if(maxGroupAll == 2 && maxGroupTable == 1 && pairCardRank < 9) {
+        0
+      } else {
+        params.minimumRaise + maxGroupAll * 20
+      }
     } else if (maxColorsAll == 5) {
       params.stack
     } else {
@@ -166,7 +171,7 @@ object Player {
     val myStack = getMyStack(request)
     val betParams = BetParams(myCards, communityCards, betIndex, minRaise, myStack)
     decideBet(betParams)
-  }.getOrElse(random.nextInt(100))
+  }.getOrElse(0)
 
   def showdown(game: JsonElement) {
 
