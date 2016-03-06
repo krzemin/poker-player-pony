@@ -2,7 +2,6 @@ package org.leanpoker.player
 
 import com.google.gson.JsonElement
 import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 
 case class Card(rank: Char, suits: String)
 
@@ -11,7 +10,7 @@ case class Card(rank: Char, suits: String)
 
 object Player {
 
-  val VERSION = "Default Scala folding player"
+  val VERSION = "0.0.1"
 
   val MyName = "Pony"
 
