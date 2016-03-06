@@ -16,6 +16,10 @@ class PlayerTest extends FunSpec with MustMatchers {
     Player.getMyCards(gameStateJson) must have size 2
   }
 
+  it("parse community cards") {
+    Player.getCommunityCards(gameStateJson) must have size 3
+  }
+
   it("parse minimum raise") {
     Player.getMinimumRaise(gameStateJson) mustBe 240
   }

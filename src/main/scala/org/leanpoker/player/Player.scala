@@ -1,12 +1,12 @@
 package org.leanpoker.player
 
-import com.google.gson.JsonElement
+import com.google.gson.{JsonObject, JsonElement}
 import scala.collection.JavaConversions._
 import scala.util.{Random, Try}
 
 case class Card(rank: Char, suits: String)  {
   def getRankInt: Int = {
-    val rankToNumMap = Map{
+    val rankToNumMap = Map(
       'A' -> 13,
       'K' -> 12,
       'Q' -> 11,
@@ -20,7 +20,7 @@ case class Card(rank: Char, suits: String)  {
       '4' -> 3,
       '3' -> 2,
       '2' -> 1
-    }
+    )
     rankToNumMap(rank)
   }
 }
@@ -36,22 +36,29 @@ object Player {
   val MyName = "Pony"
 
 
+  def parseCard(cardJson: JsonObject): Card = {
+    Card(
+      cardJson.get("rank").getAsString.head,
+      cardJson.get("suit").getAsString
+    )
+  }
+
   def getMyCards(request: JsonElement): List[Card] = {
     val players = request.getAsJsonObject.get("players").getAsJsonArray.map(_.getAsJsonObject)
     val myPlayerOpt = players.find(_.get("name").getAsString == MyName)
     myPlayerOpt match {
       case Some(myPlayer) =>
         val myCards = myPlayer.get("hole_cards").getAsJsonArray.map(_.getAsJsonObject).toList
-        myCards.map { cardJson =>
-          Card(
-            cardJson.get("rank").getAsString.head,
-            cardJson.get("suit").getAsString
-          )
-        }
+        myCards.map(parseCard)
       case None =>
         List.empty
     }
   }
+
+  def getCommunityCards(request: JsonElement): List[Card] = {
+    request.getAsJsonObject.get("community_cards").getAsJsonArray.toList.map(j => parseCard(j.getAsJsonObject))
+  }
+
 
   def getMinimumRaise(request: JsonElement): Int = {
     request.getAsJsonObject.get("minimum_raise").getAsInt
