@@ -2,6 +2,7 @@ package org.leanpoker.player
 
 import com.google.gson.JsonElement
 import scala.collection.JavaConversions._
+import scala.util.{Random, Try}
 
 case class Card(rank: Char, suits: String)
 
@@ -34,8 +35,9 @@ object Player {
     }
   }
 
+  val random = new Random()
 
-  def betRequest(request: JsonElement) = {
+  def betRequest(request: JsonElement) = Try {
 
     val myCards = getMyCards(request)
 
@@ -44,7 +46,7 @@ object Player {
     } else {
       0
     }
-  }
+  }.getOrElse(random.nextInt(100))
 
   def showdown(game: JsonElement) {
 
