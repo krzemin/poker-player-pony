@@ -6,7 +6,10 @@ object Player {
 
   val VERSION = "Default Scala folding player"
 
-  def betRequest(request: JsonElement) = 0
+  def betRequest(request: JsonElement) = {
+
+    request.getAsJsonObject.get("pot").getAsInt()
+  }
 
   def showdown(game: JsonElement) {
 
