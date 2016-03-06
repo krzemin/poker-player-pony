@@ -214,7 +214,7 @@ object Player {
   )
 
   def getStartHandPower(myCards: List[Card]): Double = {
-    statistics.getOrElse(getRankHand(myCards), 2.0) / 100.0
+    statistics.getOrElse(getRankHand(myCards), 0.6) * 3 / 100.0
   }
 
   def getRankHand(myCards: List[Card]): RankHand = {
