@@ -25,7 +25,10 @@ case class Card(rank: Char, suits: String)  {
   }
 }
 
-
+case class BetParams(myCards: List[Card],
+                     communityCards: List[Card],
+                     betIdx: Int,
+                     minimumRaise: Int)
 
 
 
@@ -59,20 +62,33 @@ object Player {
     request.getAsJsonObject.get("community_cards").getAsJsonArray.toList.map(j => parseCard(j.getAsJsonObject))
   }
 
-
   def getMinimumRaise(request: JsonElement): Int = {
     request.getAsJsonObject.get("minimum_raise").getAsInt
   }
 
+  def getBetIndex(request: JsonElement): Int = {
+    request.getAsJsonObject.get("bet_index").getAsInt
+  }
+
   val random = new Random()
 
-  def decideBet(myCards: List[Card],
-                communityCards: List[Card],
-                minimumRaise: Int): Int = {
-    if((myCards ++ communityCards).groupBy(_.rank).values.exists(_.size == 2)) {
-      minimumRaise + 50
+  def decideBet(params: BetParams): Int = {
+
+    val allCards = params.myCards ++ params.communityCards
+
+    val maxGroup = allCards
+      .groupBy(_.rank)
+      .values
+      .map(_.size)
+      .max
+
+    if(maxGroup >= 2) {
+      params.minimumRaise + maxGroup * 100
     } else {
-      if(random.nextBoolean()) minimumRaise else 0
+      if(params.betIdx <= 2 || random.nextBoolean())
+        params.minimumRaise
+      else
+        0
     }
   }
 
@@ -80,8 +96,10 @@ object Player {
   def betRequest(request: JsonElement) = Try {
     val myCards = getMyCards(request)
     val communityCards = getCommunityCards(request)
+    val betIndex = getBetIndex(request)
     val minRaise = getMinimumRaise(request)
-    decideBet(myCards, communityCards, minRaise)
+    val betParams = BetParams(myCards, communityCards, betIndex, minRaise)
+    decideBet(betParams)
   }.getOrElse(random.nextInt(100))
 
   def showdown(game: JsonElement) {
