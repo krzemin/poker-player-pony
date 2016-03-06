@@ -146,7 +146,7 @@ object Player {
     if (isStrit(params.myCards, params.communityCards)) {
       params.minimumRaise + 50
     } else if (maxGroupAll >= 2 && maxGroupAll != maxGroupTable) {
-      val pairCardRank = params.myCards.map(_.getRankInt).intersect(params.communityCards.map(_.getRankInt)).head
+      lazy val pairCardRank = params.myCards.map(_.getRankInt).intersect(params.communityCards.map(_.getRankInt)).head
       if(maxGroupAll == 2 && maxGroupTable == 1 && pairCardRank < 9) {
         0
       } else {
