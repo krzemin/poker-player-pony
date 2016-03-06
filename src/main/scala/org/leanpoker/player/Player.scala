@@ -149,6 +149,12 @@ object Player {
       contains(4)
   }
 
+  def isFull(myCards: List[Card], community: List[Card]): Boolean = {
+    val allCards = myCards ++ community
+    val cardsGrouped = allCards.groupBy(_.rank)
+    cardsGrouped.values.exists(_.size == 3) && cardsGrouped.values.exists(_.size == 2)
+  }
+
   def decideBet(params: BetParams): Int = {
 
     val allCards = params.myCards ++ params.communityCards
@@ -160,7 +166,9 @@ object Player {
     val maxColorsAll = colorGroupOf(allCards)
     val maxColorsTable = colorGroupOf(params.communityCards)
 
-    if (isStrit(params.myCards, params.communityCards)) {
+    if (isFull(params.myCards, params.communityCards) && !isFull(Nil, params.communityCards)) {
+      params.stack
+    } else if (isStrit(params.myCards, params.communityCards)) {
       params.buyIn + (if(params.bet <= params.smallBlind * 2) 50 else 0)
     } else if (maxGroupAll >= 2 && (maxGroupMine >= 2 || maxGroupAll != maxGroupTable)) {
       params.buyIn + (if(params.bet <= params.smallBlind * 2) maxGroupAll * 30 else 0)
