@@ -40,7 +40,9 @@ case class BetParams(myCards: List[Card],
                      communityCards: List[Card],
                      betIdx: Int,
                      buyIn: Int,
-                     stack: Int)
+                     stack: Int,
+                     bet: Int,
+                     smallBlind: Int)
 
 
 
@@ -81,6 +83,17 @@ object Player {
     }
   }
 
+  def getMyBet(request: JsonElement): Int = {
+    val players = request.getAsJsonObject.get("players").getAsJsonArray.map(_.getAsJsonObject)
+    val myPlayerOpt = players.find(_.get("name").getAsString == MyName)
+    myPlayerOpt match {
+      case Some(myPlayer) =>
+        myPlayer.get("bet").getAsInt
+      case None =>
+        0
+    }
+  }
+
 
   def getCommunityCards(request: JsonElement): List[Card] = {
     request.getAsJsonObject.get("community_cards").getAsJsonArray.toList.map(j => parseCard(j.getAsJsonObject))
@@ -92,6 +105,9 @@ object Player {
 
   def getBetIndex(request: JsonElement): Int = {
     request.getAsJsonObject.get("bet_index").getAsInt
+  }
+  def getSmallBlind(request: JsonElement): Int = {
+    request.getAsJsonObject.get("small_blind").getAsInt
   }
 
   val random = new Random()
@@ -145,9 +161,9 @@ object Player {
     val maxColorsTable = colorGroupOf(params.communityCards)
 
     if (isStrit(params.myCards, params.communityCards)) {
-      params.buyIn + 50
+      params.buyIn + (if(params.bet <= params.smallBlind * 2) 50 else 0)
     } else if (maxGroupAll >= 2 && (maxGroupMine >= 2 || maxGroupAll != maxGroupTable)) {
-      params.buyIn + maxGroupAll * 30
+      params.buyIn + (if(params.bet <= params.smallBlind * 2) maxGroupAll * 30 else 0)
     } else if (maxColorsAll == 5) {
       params.stack
     } else {
@@ -165,7 +181,9 @@ object Player {
     val betIndex = getBetIndex(request)
     val minRaise = getMinBuyIn(request)
     val myStack = getMyStack(request)
-    val betParams = BetParams(myCards, communityCards, betIndex, minRaise, myStack)
+    val myBet = getMyBet(request)
+    val smallBlind = getSmallBlind(request)
+    val betParams = BetParams(myCards, communityCards, betIndex, minRaise, myStack, myBet, smallBlind)
     decideBet(betParams)
   }.getOrElse(0)
 
