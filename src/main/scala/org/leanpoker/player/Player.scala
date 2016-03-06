@@ -8,7 +8,8 @@ object Player {
 
   def betRequest(request: JsonElement) = {
 
-    request.getAsJsonObject.get("pot").getAsInt()
+    //request.getAsJsonObject.get("pot").getAsInt()
+    120
   }
 
   def showdown(game: JsonElement) {
