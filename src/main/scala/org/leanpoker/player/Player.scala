@@ -19,12 +19,10 @@ object Player {
   def getMyCards(request: JsonElement): List[Card] = {
     val players = request.getAsJsonObject.get("players").getAsJsonArray.map(_.getAsJsonObject)
     val myPlayerOpt = players.find(_.get("name").getAsString == MyName)
-    println(myPlayerOpt)
     myPlayerOpt match {
       case Some(myPlayer) =>
         val myCards = myPlayer.get("hole_cards").getAsJsonArray.map(_.getAsJsonObject).toList
         myCards.map { cardJson =>
-          println(cardJson)
           Card(
             cardJson.get("rank").getAsString.head,
             cardJson.get("suit").getAsString
@@ -35,17 +33,25 @@ object Player {
     }
   }
 
+  def getMinimumRaise(request: JsonElement): Int = {
+    request.getAsJsonObject.get("minimum_raise").getAsInt
+  }
+
   val random = new Random()
 
-  def betRequest(request: JsonElement) = Try {
-
-    val myCards = getMyCards(request)
-
+  def decideBet(myCards: List[Card], minimumRaise: Int): Int = {
     if(myCards.groupBy(_.rank).values.exists(_.size == 2)) {
-      100
+      minimumRaise
     } else {
       0
     }
+  }
+
+
+  def betRequest(request: JsonElement) = Try {
+    val myCards = getMyCards(request)
+    val minRaise = getMinimumRaise(request)
+    decideBet(myCards, minRaise)
   }.getOrElse(random.nextInt(100))
 
   def showdown(game: JsonElement) {
