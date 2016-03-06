@@ -138,6 +138,7 @@ object Player {
     val allCards = params.myCards ++ params.communityCards
 
     val maxGroupAll = maxGroupOf(allCards)
+    val maxGroupMine = maxGroupOf(params.myCards)
     val maxGroupTable = maxGroupOf(params.communityCards)
 
     val maxColorsAll = colorGroupOf(allCards)
@@ -145,7 +146,7 @@ object Player {
 
     if (isStrit(params.myCards, params.communityCards)) {
       params.buyIn + 50
-    } else if (maxGroupAll >= 2 && maxGroupAll != maxGroupTable) {
+    } else if (maxGroupAll >= 2 && (maxGroupMine >= 2 || maxGroupAll != maxGroupTable)) {
       params.buyIn + maxGroupAll * 30
     } else if (maxColorsAll == 5) {
       params.stack
