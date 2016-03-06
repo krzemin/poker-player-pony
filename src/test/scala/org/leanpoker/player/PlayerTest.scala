@@ -3,7 +3,6 @@ package org.leanpoker.player
 import java.io.InputStreamReader
 
 import com.google.gson.JsonParser
-import com.google.gson.stream.JsonReader
 import org.scalatest.{FunSpec, MustMatchers}
 
 class PlayerTest extends FunSpec with MustMatchers {
@@ -29,5 +28,10 @@ class PlayerTest extends FunSpec with MustMatchers {
   it("should bet minimum raise when have pair") {
     Player.decideBet(pair, Nil, 100) mustBe 100
   }
+
+  it("should bet minimum raise when have pair with community") {
+    Player.decideBet(List(Card('A', "")), List(Card('A', "")), 200) mustBe 200
+  }
+
 
 }
