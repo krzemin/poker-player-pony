@@ -83,11 +83,13 @@ object Player {
   val random = new Random()
 
   def maxGroupOf(cards: List[Card]): Int = {
-    cards
-      .groupBy(_.rank)
-      .values
-      .map(_.size)
-      .max
+    if(cards.isEmpty) 0
+    else
+      cards
+        .groupBy(_.rank)
+        .values
+        .map(_.size)
+        .max
   }
 
   def decideBet(params: BetParams): Int = {
