@@ -122,6 +122,16 @@ object Player {
         .max
   }
 
+
+  def isStrit(myCards: List[Card], community: List[Card]): Boolean = {
+    (myCards ++ community).
+      sortBy(_.rank).
+      map(_.getRankInt).
+      sliding(5).
+      map(l => l.last - l.head).
+      contains(4)
+  }
+
   def decideBet(params: BetParams): Int = {
 
     val allCards = params.myCards ++ params.communityCards
@@ -132,8 +142,10 @@ object Player {
     val maxColorsAll = colorGroupOf(allCards)
     val maxColorsTable = colorGroupOf(params.communityCards)
 
-    if(maxGroupAll >= 2 && maxGroupAll != maxGroupTable) {
-      params.minimumRaise + maxGroupAll * 100
+    if(isStrit(params.myCards, params.communityCards)) {
+      params.minimumRaise + 50
+    } else if(maxGroupAll >= 2 && maxGroupAll != maxGroupTable) {
+      params.minimumRaise + maxGroupAll * 20
     } else if(maxColorsAll == 5) {
       params.stack
     } else {
