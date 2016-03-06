@@ -85,7 +85,10 @@ object Player {
     if(maxGroup >= 2) {
       params.minimumRaise + maxGroup * 100
     } else {
-      if(params.betIdx <= 2 || random.nextBoolean())
+
+      val hasStrongCards = allCards.map(_.getRankInt).size > 18
+
+      if(params.betIdx <= 1 || (hasStrongCards && random.nextDouble() < 0.8) || random.nextDouble() < 0.3)
         params.minimumRaise
       else
         0
