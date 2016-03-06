@@ -4,7 +4,7 @@ import com.google.gson.{JsonObject, JsonElement}
 import scala.collection.JavaConversions._
 import scala.util.{Random, Try}
 
-case class Card(rank: Char, suits: String)  {
+case class Card(rank: Char, suit: String)  {
   def getRankInt: Int = {
     val rankToNumMap = Map(
       'A' -> 13,
@@ -24,6 +24,16 @@ case class Card(rank: Char, suits: String)  {
     rankToNumMap(rank)
   }
 }
+
+trait TargetCombination {
+  def combRank: Int
+}
+case class Pair(rank: Char) { def combRank = 1 }
+case class TwoPairs(rank1: Char, rank2: Char) { def combRank = 2 }
+case class Three(rank: Char) { def combRank = 3 }
+case class Street(rank: Char) { def combRank = 4 }
+case class Color(suit: String) { def combRank = 5 }
+
 
 case class BetParams(myCards: List[Card],
                      communityCards: List[Card],
@@ -72,23 +82,28 @@ object Player {
 
   val random = new Random()
 
-  def decideBet(params: BetParams): Int = {
-
-    val allCards = params.myCards ++ params.communityCards
-
-    val maxGroup = allCards
+  def maxGroupOf(cards: List[Card]): Int = {
+    cards
       .groupBy(_.rank)
       .values
       .map(_.size)
       .max
+  }
 
-    if(maxGroup >= 2) {
-      params.minimumRaise + maxGroup * 100
+  def decideBet(params: BetParams): Int = {
+
+    val allCards = params.myCards ++ params.communityCards
+
+    val maxGroupAll = maxGroupOf(allCards)
+    val maxGroupTable = maxGroupOf(params.communityCards)
+
+    if(maxGroupAll >= 2 && maxGroupAll != maxGroupTable ) {
+      params.minimumRaise + maxGroupAll * 100
     } else {
 
       val hasStrongCards = params.myCards.map(_.getRankInt).sum > 18
 
-      if(params.betIdx <= 1 || (hasStrongCards && random.nextDouble() < 0.8) || random.nextDouble() < 0.3)
+      if((hasStrongCards && random.nextDouble() < 0.65) || random.nextDouble() < 0.1)
         params.minimumRaise
       else
         0
